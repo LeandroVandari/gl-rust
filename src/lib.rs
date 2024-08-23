@@ -7,7 +7,6 @@ const LINE_LIST_LENGTH: usize = (LINES_AMOUNT * 4) + 8;
 pub fn generate_line_vertices() -> [vertex::Vertex; LINE_LIST_LENGTH] {
     let mut arr: [MaybeUninit<vertex::Vertex>; LINE_LIST_LENGTH] =
         [const { MaybeUninit::uninit() }; LINE_LIST_LENGTH];
-    const LINES_AMOUNT: usize = 5;
     // vertical
     for i in 0..LINES_AMOUNT {
         let x = ((i as f32 + 1.0) / (LINES_AMOUNT + 1) as f32) * 2.0 - 1.0;
