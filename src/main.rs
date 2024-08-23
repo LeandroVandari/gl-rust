@@ -1,3 +1,5 @@
+use std::io::Write;
+
 use gl_rust::{vertex::Vertex, LINES_AMOUNT};
 use glium::glutin::surface::WindowSurface;
 use glium::winit;
@@ -95,7 +97,7 @@ where
     ) {
         match event {
             WindowEvent::CloseRequested => {
-                println!("Closing window...");
+                println!("\nClosing window...");
                 event_loop.exit();
             }
             WindowEvent::RedrawRequested => {
@@ -106,10 +108,12 @@ where
 
                 let time_since_fps_calc = time_now - self.last_fps_calc;
                 if time_since_fps_calc >= std::time::Duration::from_secs(1) {
-                    println!(
-                        "{}FPS",
+                    print!(
+                        "\r{:.1}FPS",
                         self.frames as f64 / time_since_fps_calc.as_secs_f64()
                     );
+
+                    let _ = std::io::stdout().flush();
                     self.frames = 0;
                     self.last_fps_calc = time_now;
                 }
@@ -151,11 +155,11 @@ where
                 use winit::keyboard::NamedKey;
                 match key {
                     NamedKey::Escape => {
-                        println!("Closing window...");
+                        println!("\nClosing window...");
                         event_loop.exit();
                     }
                     NamedKey::Space => {
-                        println!("{:?}", self.offset);
+                       // println!("{:?}", self.offset);
                     }
                     _ => {}
                 }
@@ -167,6 +171,11 @@ where
                 ..
             } => {
                 self.moving = matches!(state, winit::event::ElementState::Pressed);
+                if self.moving {
+                    self.window.set_cursor(winit::window::Cursor::Icon(winit::window::CursorIcon::Grabbing))
+                } else {
+                    self.window.set_cursor(winit::window::Cursor::Icon(winit::window::CursorIcon::Default))
+                }
             }
             WindowEvent::CursorMoved { position, .. } => {
                 let prev_mouse_pos = self.last_mouse_pos;

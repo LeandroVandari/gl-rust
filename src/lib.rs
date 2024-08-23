@@ -39,7 +39,5 @@ pub fn generate_line_vertices() -> [vertex::Vertex; LINE_LIST_LENGTH] {
             [vertex::Vertex; LINE_LIST_LENGTH],
         >(arr)
     };
-
-    println!("{new_arr:?}");
     new_arr
 }
