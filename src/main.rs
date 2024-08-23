@@ -159,7 +159,7 @@ where
                         event_loop.exit();
                     }
                     NamedKey::Space => {
-                       // println!("{:?}", self.offset);
+                        // println!("{:?}", self.offset);
                     }
                     _ => {}
                 }
@@ -172,9 +172,13 @@ where
             } => {
                 self.moving = matches!(state, winit::event::ElementState::Pressed);
                 if self.moving {
-                    self.window.set_cursor(winit::window::Cursor::Icon(winit::window::CursorIcon::Grabbing))
+                    self.window.set_cursor(winit::window::Cursor::Icon(
+                        winit::window::CursorIcon::Grabbing,
+                    ))
                 } else {
-                    self.window.set_cursor(winit::window::Cursor::Icon(winit::window::CursorIcon::Default))
+                    self.window.set_cursor(winit::window::Cursor::Icon(
+                        winit::window::CursorIcon::Default,
+                    ))
                 }
             }
             WindowEvent::CursorMoved { position, .. } => {
