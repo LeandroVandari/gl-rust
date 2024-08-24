@@ -1,3 +1,4 @@
+use std::cmp::min;
 use std::io::Write;
 
 use gl_rust::{vertex::Vertex, LINES_AMOUNT};
@@ -33,6 +34,9 @@ where
     last_frame: std::time::Instant,
     last_fps_calc: std::time::Instant,
     frames: u32,
+
+    zoom: f32,
+    view: [[f32; 4]; 4],
 }
 
 impl App<glium::index::NoIndices> {
@@ -78,6 +82,14 @@ impl App<glium::index::NoIndices> {
             last_frame: std::time::Instant::now(),
             last_fps_calc: std::time::Instant::now(),
             frames: 0,
+
+            zoom: -1.0,
+            view: [
+                [1.0, 0.0, 0.0, 0.0],
+                [0.0, 1.0, 0.0, 0.0],
+                [0.0, 0.0, -1.0, -1.0],
+                [0.0, 0.0, 0.0, 0.0],
+            ],
         }
     }
 }
@@ -121,8 +133,9 @@ where
                 let mut frame = self.display.draw();
 
                 let uniforms = glium::uniform! {
-                    offset: self.offset
-
+                    offset: self.offset,
+                    view: self.view,
+                    zoom: self.zoom
                 };
 
                 frame.clear_color(0.0, 0.0, 0.0, 1.0);
@@ -186,10 +199,22 @@ where
                 let position_x = position.x as f32;
                 let position_y = position.y as f32;
                 self.last_mouse_pos = (position_x, position_y);
+
                 if self.moving {
                     let x_diff = position_x - prev_mouse_pos.0;
                     let y_diff = position_y - prev_mouse_pos.1;
                     let size = self.window.inner_size();
+                    if position_x < 0.0
+                        || position_y < 0.0
+                        || position_x > size.width as f32
+                        || position_y > size.height as f32
+                    {
+                        self.moving = false;
+                        self.window.set_cursor(winit::window::Cursor::Icon(
+                            winit::window::CursorIcon::Default,
+                        ));
+                        return;
+                    }
                     self.offset[0] += x_diff * 2.0 / size.width as f32;
                     self.offset[1] += y_diff * 2.0 / size.height as f32;
 
@@ -208,6 +233,13 @@ where
                             -sign * (2.0 / (LINES_AMOUNT + 1) as f32) + self.offset[1].fract();
                     }
                 }
+            }
+            WindowEvent::MouseWheel {
+                delta: winit::event::MouseScrollDelta::LineDelta(_x, y),
+                phase: winit::event::TouchPhase::Moved,
+                ..
+            } => {
+                self.zoom = (-0.1f32).min(self.zoom + y * 0.1);
             }
             _ => (),
         }

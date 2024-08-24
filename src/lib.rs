@@ -1,7 +1,7 @@
 pub mod vertex;
 use std::mem::{self, MaybeUninit};
 
-pub const LINES_AMOUNT: usize = 5;
+pub const LINES_AMOUNT: usize = 10;
 const LINE_LIST_LENGTH: usize = (LINES_AMOUNT * 4) + 8;
 
 pub fn generate_line_vertices() -> [vertex::Vertex; LINE_LIST_LENGTH] {
