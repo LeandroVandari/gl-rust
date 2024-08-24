@@ -1,4 +1,3 @@
-use std::cmp::min;
 use std::io::Write;
 
 use gl_rust::{vertex::Vertex, LINES_AMOUNT};
