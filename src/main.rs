@@ -214,22 +214,17 @@ where
                         ));
                         return;
                     }
+
                     self.offset[0] += x_diff * 2.0 / size.width as f32;
                     self.offset[1] += y_diff * 2.0 / size.height as f32;
 
-                    if self.offset[0] < -(2.0 / (LINES_AMOUNT + 1) as f32)
-                        || self.offset[0] > (2.0 / (LINES_AMOUNT + 1) as f32)
-                    {
-                        let sign = self.offset[0].signum();
-                        self.offset[0] =
-                            -sign * (2.0 / (LINES_AMOUNT + 1) as f32) + self.offset[0].fract();
-                    }
-                    if self.offset[1] < -(2.0 / (LINES_AMOUNT + 1) as f32)
-                        || self.offset[1] > (2.0 / (LINES_AMOUNT + 1) as f32)
-                    {
-                        let sign = self.offset[1].signum();
-                        self.offset[1] =
-                            -sign * (2.0 / (LINES_AMOUNT + 1) as f32) + self.offset[1].fract();
+                    for off in self.offset.as_mut() {
+                        if *off < -(2.0 / (LINES_AMOUNT + 1) as f32)
+                            || *off > (2.0 / (LINES_AMOUNT + 1) as f32)
+                        {
+                            let sign = off.signum();
+                            *off = -sign * (2.0 / (LINES_AMOUNT + 1) as f32) + off.fract();
+                        }
                     }
                 }
             }
