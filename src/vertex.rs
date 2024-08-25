@@ -2,7 +2,7 @@ use glium;
 
 #[derive(Copy, Clone, Debug)]
 pub struct Vertex {
-    position: [f32; 2],
+    pub position: [f32; 2],
     is_horizontal: u32,
 }
 

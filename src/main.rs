@@ -34,6 +34,7 @@ where
     last_fps_calc: std::time::Instant,
     frames: u32,
 
+    lines: Vec<gl_rust::vertex::Vertex>,
     lines_in_view: usize,
     starting_lines_amount: usize,
     zoom: i64,
@@ -86,6 +87,7 @@ impl App<glium::index::NoIndices> {
             last_fps_calc: std::time::Instant::now(),
             frames: 0,
 
+            lines,
             lines_in_view: starting_lines_amount,
             starting_lines_amount,
             zoom: 10,
@@ -240,8 +242,16 @@ where
                 ..
             } => {
                 self.zoom = 1.max(self.zoom + y as i64);
-                let space_between_lines = 2.0 / self.starting_lines_amount as f64;
-                println!("{}", self.zoom);
+                let space_between_lines = 2.0 / (self.starting_lines_amount+1) as f64;
+                let mut last_line_coord = self.lines[self.lines.len()-1].position[1] as f64;
+                while last_line_coord < self.zoom as f64/10.0 + space_between_lines {
+                    let next_coord = last_line_coord + space_between_lines;
+                    self.lines.extend(gl_rust::create_line_vertices_at_coord(next_coord as f32));
+                    self.lines.extend(gl_rust::create_line_vertices_at_coord(-next_coord as f32));
+                    self.vertex_buffer = glium::VertexBuffer::new(&self.display,&self.lines).unwrap();
+                    self.lines_in_view += 4;
+                    last_line_coord = next_coord;
+                }
             }
             _ => (),
         }
