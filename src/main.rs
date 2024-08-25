@@ -35,7 +35,8 @@ where
     frames: u32,
 
     lines_in_view: usize,
-    zoom: f32,
+    starting_lines_amount: usize,
+    zoom: i64,
     view: [[f32; 4]; 4],
 }
 
@@ -58,8 +59,8 @@ impl App<glium::index::NoIndices> {
                 let frag_shader = include_str!("shader.frag");
         */
 
-        let lines_in_view = 10;
-        let lines = gl_rust::generate_line_vertices(lines_in_view);
+        let starting_lines_amount = 10;
+        let lines = gl_rust::generate_line_vertices(starting_lines_amount);
         let vertex_buffer = glium::VertexBuffer::new(&display, &lines).unwrap();
         let indices = glium::index::NoIndices(glium::index::PrimitiveType::LinesList);
 
@@ -85,8 +86,9 @@ impl App<glium::index::NoIndices> {
             last_fps_calc: std::time::Instant::now(),
             frames: 0,
 
-            lines_in_view,
-            zoom: -1.0,
+            lines_in_view: starting_lines_amount,
+            starting_lines_amount,
+            zoom: 10,
             view: [
                 [1.0, 0.0, 0.0, 0.0],
                 [0.0, 1.0, 0.0, 0.0],
@@ -138,7 +140,7 @@ where
                 let uniforms = glium::uniform! {
                     offset: self.offset,
                     view: self.view,
-                    zoom: self.zoom
+                    zoom: -(self.zoom as f32)/10.0
                 };
 
                 frame.clear_color(0.0, 0.0, 0.0, 1.0);
@@ -219,8 +221,8 @@ where
                         return;
                     }
 
-                    self.offset[0] += x_diff * 2.0 / size.width as f32;
-                    self.offset[1] += y_diff * 2.0 / size.height as f32;
+                    self.offset[0] += x_diff * 2.0 / size.width as f32 * (self.zoom as f32/10.0);
+                    self.offset[1] += y_diff * 2.0 / size.height as f32* (self.zoom as f32/10.0);
 
                     for off in self.offset.as_mut() {
                         if *off < -(2.0 / (self.lines_in_view + 1) as f32)
@@ -237,7 +239,9 @@ where
                 phase: winit::event::TouchPhase::Moved,
                 ..
             } => {
-                self.zoom = (-0.1f32).min(self.zoom + y * 0.1);
+                self.zoom = 1.max(self.zoom + y as i64);
+                let space_between_lines = 2.0 / self.starting_lines_amount as f64;
+                println!("{}", self.zoom);
             }
             _ => (),
         }
