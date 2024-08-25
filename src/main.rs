@@ -248,10 +248,11 @@ where
                     let next_coord = last_line_coord + space_between_lines;
                     self.lines.extend(gl_rust::create_line_vertices_at_coord(next_coord as f32));
                     self.lines.extend(gl_rust::create_line_vertices_at_coord(-next_coord as f32));
-                    self.vertex_buffer = glium::VertexBuffer::new(&self.display,&self.lines).unwrap();
                     self.lines_in_view += 4;
                     last_line_coord = next_coord;
                 }
+                self.vertex_buffer = glium::VertexBuffer::new(&self.display,&self.lines).unwrap();
+                println!("Lines vec size: {}MB", self.lines.len() as f64*std::mem::size_of::<gl_rust::vertex::Vertex>() as f64/(1024.0*1024.0))
             }
             _ => (),
         }
