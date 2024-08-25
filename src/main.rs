@@ -1,6 +1,6 @@
 use std::io::Write;
 
-use gl_rust::{vertex::Vertex, LINES_AMOUNT};
+use gl_rust::vertex::Vertex;
 use glium::glutin::surface::WindowSurface;
 use glium::winit;
 use glium::winit::event::WindowEvent;
@@ -34,6 +34,7 @@ where
     last_fps_calc: std::time::Instant,
     frames: u32,
 
+    lines_in_view: usize,
     zoom: f32,
     view: [[f32; 4]; 4],
 }
@@ -56,7 +57,9 @@ impl App<glium::index::NoIndices> {
                 let vert_shader = include_str!("shader.vert");
                 let frag_shader = include_str!("shader.frag");
         */
-        let lines = gl_rust::generate_line_vertices();
+
+        let lines_in_view = 10;
+        let lines = gl_rust::generate_line_vertices(lines_in_view);
         let vertex_buffer = glium::VertexBuffer::new(&display, &lines).unwrap();
         let indices = glium::index::NoIndices(glium::index::PrimitiveType::LinesList);
 
@@ -82,6 +85,7 @@ impl App<glium::index::NoIndices> {
             last_fps_calc: std::time::Instant::now(),
             frames: 0,
 
+            lines_in_view,
             zoom: -1.0,
             view: [
                 [1.0, 0.0, 0.0, 0.0],
@@ -113,7 +117,7 @@ where
             }
             WindowEvent::RedrawRequested => {
                 let time_now = std::time::Instant::now();
-                let delta_t = time_now - self.last_frame;
+                let _delta_t = time_now - self.last_frame;
                 self.frames += 1;
                 self.last_frame = time_now;
 
@@ -219,11 +223,11 @@ where
                     self.offset[1] += y_diff * 2.0 / size.height as f32;
 
                     for off in self.offset.as_mut() {
-                        if *off < -(2.0 / (LINES_AMOUNT + 1) as f32)
-                            || *off > (2.0 / (LINES_AMOUNT + 1) as f32)
+                        if *off < -(2.0 / (self.lines_in_view + 1) as f32)
+                            || *off > (2.0 / (self.lines_in_view + 1) as f32)
                         {
                             let sign = off.signum();
-                            *off = -sign * (2.0 / (LINES_AMOUNT + 1) as f32) + off.fract();
+                            *off = -sign * (2.0 / (self.lines_in_view + 1) as f32) + off.fract();
                         }
                     }
                 }
