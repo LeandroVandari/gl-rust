@@ -45,7 +45,7 @@ impl App<glium::index::NoIndices> {
     fn new<U>(event_loop: &winit::event_loop::EventLoop<U>) -> Self {
         println!("Creating window...");
         let (window, display) =
-            glium::backend::glutin::SimpleWindowBuilder::new().build(event_loop);
+            glium::backend::glutin::SimpleWindowBuilder::new().with_title("Infinite grid").with_inner_size(800, 600).build(event_loop);
 
         /*let v1 = vertex::vertex(-0.5, -0.5);
                 let v2 = vertex::vertex(0.0, 0.5);
