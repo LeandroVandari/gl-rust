@@ -181,7 +181,7 @@ where
                     NamedKey::Space => {
                         // println!("{:?}", self.offset);
                     }
-                    _ => {}
+                    _ => (),
                 }
             }
 
@@ -223,8 +223,8 @@ where
                         return;
                     }
 
-                    self.offset[0] += x_diff * 2.0 / size.width as f32  * (self.zoom as f32/10.0);
-                    self.offset[1] += y_diff * 2.0 / size.height as f32 * (self.zoom as f32/10.0);
+                    self.offset[0] += x_diff * 2.0 / size.width as f32 * (self.zoom as f32 / 10.0);
+                    self.offset[1] += y_diff * 2.0 / size.height as f32 * (self.zoom as f32 / 10.0);
 
                     for off in self.offset.as_mut() {
                         if *off < -(2.0 / (self.lines_in_view + 1) as f32)
@@ -237,23 +237,27 @@ where
                 }
             }
             WindowEvent::MouseWheel {
-                delta: winit::event::MouseScrollDelta::LineDelta(_x, y),
+                delta,
                 phase: winit::event::TouchPhase::Moved,
                 ..
             } => {
+                let y = match delta {
+                    winit::event::MouseScrollDelta::LineDelta(_x, y) => y,
+                    winit::event::MouseScrollDelta::PixelDelta(diff) => (diff.y / 3.0) as f32,
+                };
                 self.zoom = 1.max(self.zoom + y as i64);
-                let space_between_lines = 2.0 / (self.starting_lines_amount+1) as f64;
-                let mut last_line_coord = self.lines[self.lines.len()-1].position[1] as f64;
-                println!("{last_line_coord}");
-                while last_line_coord < (self.zoom as f64/10.0 + space_between_lines) {
+                let space_between_lines = 2.0 / (self.starting_lines_amount + 1) as f64;
+                let mut last_line_coord = self.lines[self.lines.len() - 1].position[1] as f64;
+                while last_line_coord < (self.zoom as f64 / 10.0 + space_between_lines) {
                     let next_coord = last_line_coord + space_between_lines;
-                    self.lines.extend(gl_rust::create_line_vertices_at_coord(-next_coord as f32));
-                    self.lines.extend(gl_rust::create_line_vertices_at_coord(next_coord as f32));
+                    self.lines
+                        .extend(gl_rust::create_line_vertices_at_coord(-next_coord as f32));
+                    self.lines
+                        .extend(gl_rust::create_line_vertices_at_coord(next_coord as f32));
                     self.lines_in_view += 4;
                     last_line_coord = next_coord;
                 }
-                self.vertex_buffer = glium::VertexBuffer::new(&self.display,&self.lines).unwrap();
-                println!("Lines vec size: {}MB", self.lines.len() as f64*std::mem::size_of::<gl_rust::vertex::Vertex>() as f64/(1024.0*1024.0))
+                self.vertex_buffer = glium::VertexBuffer::new(&self.display, &self.lines).unwrap();
             }
             _ => (),
         }

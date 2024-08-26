@@ -34,14 +34,14 @@ pub fn generate_line_vertices(lines_amount: usize) -> Vec<vertex::Vertex> {
     list
 }
 
-pub fn create_line_vertices_at_coord(coord: f32) -> [vertex::Vertex;4] {
+pub fn create_line_vertices_at_coord(coord: f32) -> [vertex::Vertex; 4] {
     let mut arr = [MaybeUninit::uninit(); 4];
 
-    arr[0].write(vertex(coord,-1.0, 0));
+    arr[0].write(vertex(coord, -1.0, 0));
     arr[1].write(vertex(coord, 1.0, 0));
 
     arr[2].write(vertex(-1.0, coord, 1));
-    arr[3].write(vertex( 1.0, coord, 1));
+    arr[3].write(vertex(1.0, coord, 1));
 
-    unsafe {mem::transmute::<_, [vertex::Vertex; 4]>(arr)}
+    unsafe { mem::transmute::<_, [vertex::Vertex; 4]>(arr) }
 }
