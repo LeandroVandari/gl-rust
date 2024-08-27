@@ -45,8 +45,10 @@ where
 impl App<glium::index::NoIndices> {
     fn new<U>(event_loop: &winit::event_loop::EventLoop<U>) -> Self {
         println!("Creating window...");
-        let (window, display) =
-            glium::backend::glutin::SimpleWindowBuilder::new().with_title("Infinite grid").with_inner_size(800, 600).build(event_loop);
+        let (window, display) = glium::backend::glutin::SimpleWindowBuilder::new()
+            .with_title("Infinite grid")
+            .with_inner_size(800, 600)
+            .build(event_loop);
 
         /*let v1 = vertex::vertex(-0.5, -0.5);
                 let v2 = vertex::vertex(0.0, 0.5);
@@ -233,7 +235,8 @@ where
                             || *off > (self.viewable_coords / (self.lines_in_view + 1) as f32)
                         {
                             let sign = off.signum();
-                            *off = -sign * (self.viewable_coords / (self.lines_in_view + 1) as f32) + off.fract();
+                            *off = -sign * (self.viewable_coords / (self.lines_in_view + 1) as f32)
+                                + off.fract();
                         }
                     }
                 }
@@ -259,8 +262,8 @@ where
                     self.lines_in_view += 4;
                     last_line_coord = next_coord;
                 }
-                self.viewable_coords =self.zoom as f32*0.2;
-                self.lines_in_view = (self.viewable_coords/space_between_lines as f32) as usize;
+                self.viewable_coords = self.zoom as f32 * 0.2;
+                self.lines_in_view = (self.viewable_coords / space_between_lines as f32) as usize;
                 self.vertex_buffer = glium::VertexBuffer::new(&self.display, &self.lines).unwrap();
             }
             _ => (),
