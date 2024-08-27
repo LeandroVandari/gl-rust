@@ -37,6 +37,7 @@ where
     lines: Vec<gl_rust::vertex::Vertex>,
     lines_in_view: usize,
     starting_lines_amount: usize,
+    viewable_coords: f32,
     zoom: i64,
     view: [[f32; 4]; 4],
 }
@@ -90,6 +91,7 @@ impl App<glium::index::NoIndices> {
             lines,
             lines_in_view: starting_lines_amount,
             starting_lines_amount,
+            viewable_coords: 2.0,
             zoom: 10,
             view: [
                 [1.0, 0.0, 0.0, 0.0],
@@ -227,11 +229,11 @@ where
                     self.offset[1] += y_diff * 2.0 / size.height as f32 * (self.zoom as f32 / 10.0);
 
                     for off in self.offset.as_mut() {
-                        if *off < -(2.0 / (self.lines_in_view + 1) as f32)
-                            || *off > (2.0 / (self.lines_in_view + 1) as f32)
+                        if *off < -(self.viewable_coords / (self.lines_in_view + 1) as f32)
+                            || *off > (self.viewable_coords / (self.lines_in_view + 1) as f32)
                         {
                             let sign = off.signum();
-                            *off = -sign * (2.0 / (self.lines_in_view + 1) as f32) + off.fract();
+                            *off = -sign * (self.viewable_coords / (self.lines_in_view + 1) as f32) + off.fract();
                         }
                     }
                 }
@@ -257,6 +259,8 @@ where
                     self.lines_in_view += 4;
                     last_line_coord = next_coord;
                 }
+                self.viewable_coords =self.zoom as f32*0.2;
+                self.lines_in_view = (self.viewable_coords/space_between_lines as f32) as usize;
                 self.vertex_buffer = glium::VertexBuffer::new(&self.display, &self.lines).unwrap();
             }
             _ => (),
